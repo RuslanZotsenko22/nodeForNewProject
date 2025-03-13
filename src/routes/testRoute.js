@@ -41,14 +41,12 @@ router.post('/test', async (req, res) => {
 
     // Відправлення email-підтвердження
     const data = await sendConfirmationEmail(email, name);
-
-    res
-      .status(201)
-      .json({
-        message: 'Дані успішно збережено та email відправлено!',
-        status: 201,
-        data: data,
-      });
+    res.statusCode = 201;
+    res.status(201).json({
+      message: 'Дані успішно збережено та email відправлено!',
+      status: 201,
+      data: data,
+    });
   } catch (err) {
     console.error('Помилка збереження даних:', err);
     res.status(500).json({ message: 'Щось пішло не так!' });

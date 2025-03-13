@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config(); //використовую .env для збереження паролів
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail', // Або інший поштовий сервіс
+  service: 'seznam.cz', // Або інший поштовий сервіс Потрібно замінити на поточну
   auth: {
     user: process.env.EMAIL_USER, // Логін (твоя пошта)
     pass: process.env.EMAIL_PASS, // Пароль або спеціальний App Password
