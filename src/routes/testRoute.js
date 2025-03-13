@@ -40,11 +40,15 @@ router.post('/test', async (req, res) => {
     await newTestData.save();
 
     // Відправлення email-підтвердження
-    await sendConfirmationEmail(email, name);
+    const data = await sendConfirmationEmail(email, name);
 
     res
-      .status(200)
-      .json({ message: 'Дані успішно збережено та email відправлено!' });
+      .status(201)
+      .json({
+        message: 'Дані успішно збережено та email відправлено!',
+        status: 201,
+        data: data,
+      });
   } catch (err) {
     console.error('Помилка збереження даних:', err);
     res.status(500).json({ message: 'Щось пішло не так!' });
