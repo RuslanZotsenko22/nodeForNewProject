@@ -26,13 +26,13 @@ export const sendEmails = async (
       from: process.env.EMAIL_USER,
       to: clientEmail,
       subject: '✅ Váš požadavek byl úspěšně přijat.!',
-      //       text: `Dobrý den, ${clientName}!\n\n
-      // Děkujeme za vaši žádost! Vaši zprávu jsme obdrželi a brzy se s vámi spojíme.\n\n
-      // 📞 Vaše telefonní číslo.: ${clientPhone}\n
-      // 📝 Vaše zpráva.: ${clientMessage}\n\n
-      // Pokud máte jakékoli další dotazy, neváhejte nám napsat odpovědí na tento e-mail.\n\n
-      // S nejlepšími přáními,\n
-      // Tým podpory.`,
+      text: `Dobrý den, ${clientName}!\n\n
+      Děkujeme za vaši žádost! Vaši zprávu jsme obdrželi a brzy se s vámi spojíme.\n\n
+      📞 Vaše telefonní číslo.: ${clientPhone}\n
+      📝 Vaše zpráva.: ${clientMessage}\n\n
+      Pokud máte jakékoli další dotazy, neváhejte nám napsat odpovědí na tento e-mail.\n\n
+      S nejlepšími přáními,\n
+      Tým podpory.`,
       html: `
     <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
       <h2 style="color: #2c3e50;">Dobrý den, ${clientName}!</h2>
