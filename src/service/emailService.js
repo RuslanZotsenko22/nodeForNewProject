@@ -17,9 +17,7 @@ if (
 }
 
 const transporter = nodemailer.createTransport({
-  host: 'webmail.wedos.net', // SMTP-сервер
-  port: 465, // Порт для SSL (587 для TLS)
-  secure: true, // Використовуємо SSL
+  service: 'seznam',
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
