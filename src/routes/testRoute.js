@@ -35,11 +35,11 @@ router.post('/test', async (req, res) => {
   }
 
   // Перевірка повідомлення
-  if (message.length < 10) {
-    return res
-      .status(400)
-      .json({ message: 'Повідомлення повинно містити мінімум 10 символів!' });
-  }
+  // if (message.length < 0) {
+  //   return res
+  //     .status(400)
+  //     .json({ message: 'Повідомлення повинно містити мінімум 0 символів!' });
+  // }
 
   try {
     // Створення нового запису в базі даних

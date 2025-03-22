@@ -3,8 +3,23 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// Перевірка, чи всі змінні оточення задані
+if (
+  !process.env.EMAIL_USER ||
+  !process.env.EMAIL_PASS ||
+  !process.env.OWNER_EMAIL
+) {
+  console.error('❌ Помилка: відсутні необхідні змінні середовища!');
+  console.log('EMAIL_USER:', process.env.EMAIL_USER || '❌ Відсутній');
+  console.log('EMAIL_PASS:', process.env.EMAIL_PASS ? '✔️ Є' : '❌ Відсутній');
+  console.log('OWNER_EMAIL:', process.env.OWNER_EMAIL || '❌ Відсутній');
+  process.exit(1); // Завершуємо процес, якщо немає всіх змінних
+}
+
 const transporter = nodemailer.createTransport({
-  service: 'seznam', // Важливо! Переконайся, що це правильний сервіс
+  host: 'webmail.wedos.net', // SMTP-сервер
+  port: 465, // Порт для SSL (587 для TLS)
+  secure: true, // Використовуємо SSL
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -12,7 +27,7 @@ const transporter = nodemailer.createTransport({
 });
 
 /**
- * Функція для надсилання email клієнту та замовнику
+ * Функція для надсилання email клієнту та власнику
  */
 export const sendEmails = async (
   clientEmail,
@@ -21,54 +36,67 @@ export const sendEmails = async (
   clientMessage,
 ) => {
   try {
+    // Перевірка вхідних параметрів
+    if (!clientEmail || !clientName || !clientPhone || !clientMessage) {
+      throw new Error('❌ Відсутні необхідні параметри для відправки email!');
+    }
+
     // 📩 Повідомлення для клієнта
     const clientMailOptions = {
       from: process.env.EMAIL_USER,
       to: clientEmail,
       subject: '✅ Váš požadavek byl úspěšně přijat.!',
-      text: `Dobrý den, ${clientName}!\n\n
-      Děkujeme za vaši žádost! Vaši zprávu jsme obdrželi a brzy se s vámi spojíme.\n\n
-      📞 Vaše telefonní číslo.: ${clientPhone}\n
-      📝 Vaše zpráva.: ${clientMessage}\n\n
-      Pokud máte jakékoli další dotazy, neváhejte nám napsat odpovědí na tento e-mail.\n\n
-      S nejlepšími přáními,\n
-      Tým podpory.`,
+      text: `Dobrý den, ${clientName}!
+
+Děkujeme za vaši žádost! Vaši zprávu jsme obdrželi a brzy se s vámi spojíme.
+
+📞 Vaše telefonní číslo: ${clientPhone}
+📝 Vaše zpráva: ${clientMessage}
+
+Pokud máte jakékoli další dotazy, neváhejte nám napsat odpovědí na tento e-mail.
+
+S nejlepšími přáními,
+Tým podpory.`,
       html: `
-    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-      <h2 style="color: #2c3e50;">Dobrý den, ${clientName}!</h2>
-      <p>Děkujeme za vaši žádost! Vaši zprávu jsme obdrželi a brzy se s vámi spojíme.</p>
-      <p>Pokud máte jakékoli další dotazy, neváhejte nám napsat odpovědí na tento e-mail.</p>
-      <p>S nejlepšími přáními,</p>
-      <p><strong>Tým podpory</strong></p>
-    </div>
-  `,
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+          <h2 style="color: #2c3e50;">Dobrý den, ${clientName}!</h2>
+          <p>Děkujeme za vaši žádost! Vaši zprávu jsme obdrželi a brzy se s vámi spojíme.</p>
+          <p>Pokud máte jakékoli další dotazy, neváhejte nám napsat odpovědí na tento e-mail.</p>
+          <p>S nejlepšími přáními,</p>
+          <p><strong>Tým podpory</strong></p>
+        </div>
+      `,
     };
 
-    // 📩 Повідомлення для замовника
+    // 📩 Повідомлення для власника
     const ownerMailOptions = {
       from: process.env.EMAIL_USER,
       to: process.env.OWNER_EMAIL,
       subject: 'Nová žádost od klienta.',
-      text: `📩 Nová žádost od klienta!\n\n
-  🔹 Jméno a příjmení: ${clientName}\n
-  📧 Email: ${clientEmail}\n
-  📞 Telefon: ${clientPhone}\n
-  📝 Zpráva:\n${clientMessage}\n\n
-  📅 Datum odeslání: ${new Date().toLocaleString()}`,
+      text: `📩 Nová žádost od klienta!
+
+🔹 Jméno a příjmení: ${clientName}
+📧 Email: ${clientEmail}
+📞 Telefon: ${clientPhone}
+📝 Zpráva:
+${clientMessage}
+
+📅 Datum odeslání: ${new Date().toLocaleString()}`,
     };
 
-    // Відправляємо обидва листи паралельно
+    // Відправлення листів
     await Promise.all([
       transporter.sendMail(clientMailOptions),
       transporter.sendMail(ownerMailOptions),
     ]);
 
     console.log(
-      `Email надіслано на ${clientEmail} і ${process.env.OWNER_EMAIL}`,
+      `✅ Email надіслано на ${clientEmail} і ${process.env.OWNER_EMAIL}`,
     );
     return true;
   } catch (error) {
-    console.error('Помилка при відправці email:', error);
+    console.error('❌ Помилка при відправці email:', error.message);
+    if (error.response) console.error('📩 SMTP Відповідь:', error.response);
     return false;
   }
 };
