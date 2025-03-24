@@ -1,9 +1,10 @@
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+import path from 'path';
 
 dotenv.config();
 
-// Перевірка, чи всі змінні оточення задані
+// Перевірка змінних середовища
 if (
   !process.env.EMAIL_USER ||
   !process.env.EMAIL_PASS ||
@@ -13,7 +14,7 @@ if (
   console.log('EMAIL_USER:', process.env.EMAIL_USER || '❌ Відсутній');
   console.log('EMAIL_PASS:', process.env.EMAIL_PASS ? '✔️ Є' : '❌ Відсутній');
   console.log('OWNER_EMAIL:', process.env.OWNER_EMAIL || '❌ Відсутній');
-  process.exit(1); // Завершуємо процес, якщо немає всіх змінних
+  process.exit(1);
 }
 
 const transporter = nodemailer.createTransport({
@@ -24,9 +25,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-/**
- * Функція для надсилання email клієнту та власнику
- */
 export const sendEmails = async (
   clientEmail,
   clientName,
@@ -34,7 +32,6 @@ export const sendEmails = async (
   clientMessage,
 ) => {
   try {
-    // Перевірка вхідних параметрів
     if (!clientEmail || !clientName || !clientPhone || !clientMessage) {
       throw new Error('❌ Відсутні необхідні параметри для відправки email!');
     }
@@ -44,26 +41,28 @@ export const sendEmails = async (
       from: process.env.EMAIL_USER,
       to: clientEmail,
       subject: '✅ Váš požadavek byl úspěšně přijat.!',
-      text: `Dobrý den, ${clientName}!
-
-Děkujeme za vaši žádost! Vaši zprávu jsme obdrželi a brzy se s vámi spojíme.
-
-📞 Vaše telefonní číslo: ${clientPhone}
-📝 Vaše zpráva: ${clientMessage}
-
-Pokud máte jakékoli další dotazy, neváhejte nám napsat odpovědí na tento e-mail.
-
-S nejlepšími přáními,
-Tým podpory.`,
+      text: `Dobrý den, ${clientName}! Děkujeme za vaši žádost...`,
       html: `
-        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-          <h2 style="color: #2c3e50;">Dobrý den, ${clientName}!</h2>
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; text-align: center;">
+          <img 
+            src="cid:logo" 
+            alt="Logo" 
+            style="width: 300px; height: auto; margin-bottom: 24px; display: block; margin-left: auto; margin-right: auto;" 
+          />
+          <h2 style="margin-top: 0;">Dobrý den, ${clientName}!</h2>
           <p>Děkujeme za vaši žádost! Vaši zprávu jsme obdrželi a brzy se s vámi spojíme.</p>
           <p>Pokud máte jakékoli další dotazy, neváhejte nám napsat odpovědí na tento e-mail.</p>
-          <p>S nejlepšími přáními,</p>
-          <p><strong>Tým podpory</strong></p>
+          <p>S pozdravem,</p>
+          <p><strong>Jednatel RRP s.r.o.</strong></p>
         </div>
       `,
+      attachments: [
+        {
+          filename: 'logo.png',
+          path: path.resolve('src/assets/logo.png.png'), // 👈 переконайся, що шлях правильний
+          cid: 'logo',
+        },
+      ],
     };
 
     // 📩 Повідомлення для власника
@@ -82,7 +81,6 @@ ${clientMessage}
 📅 Datum odeslání: ${new Date().toLocaleString()}`,
     };
 
-    // Відправлення листів
     await Promise.all([
       transporter.sendMail(clientMailOptions),
       transporter.sendMail(ownerMailOptions),

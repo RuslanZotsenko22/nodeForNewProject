@@ -1,16 +1,21 @@
-// createRouter.js
 import express from 'express';
-import TeamMember from '../models/teamMemberModel.js'; //../models/TeamMember.js
-import { upload, handlePhotoInput } from '../middleware/upload.js';
+import TeamMember from '../models/teamMemberModel.js';
+import {
+  upload,
+  handlePhotoInput,
+  deleteCloudinaryImage,
+} from '../middleware/upload.js';
 
 const router = express.Router();
 
+// ➕ Створити нового учасника
 router.post(
   '/team',
   upload.single('image'),
   handlePhotoInput,
   async (req, res) => {
-    const { firstName, lastName, position, photoUrl } = req.body;
+    const { firstName, lastName, position, photoUrl, cloudinaryPublicId } =
+      req.body;
 
     if (!firstName || !lastName || !position) {
       return res.status(400).json({ message: 'Всі поля обов’язкові' });
@@ -21,9 +26,9 @@ router.post(
         firstName,
         lastName,
         position,
-        photoUrl: req.photoSource === 'url' ? photoUrl : undefined,
-        localPhotoPath:
-          req.photoSource === 'file' ? req.body.photoFilePath : undefined,
+        photoUrl: req.photoSource === 'url' ? photoUrl : req.body.cloudinaryUrl,
+        cloudinaryPublicId:
+          req.photoSource === 'file' ? cloudinaryPublicId : undefined,
       });
 
       await newMember.save();
@@ -37,7 +42,7 @@ router.post(
   },
 );
 
-// 📤 GET: Отримати всіх учасників команди
+// 📤 Отримати всіх учасників
 router.get('/team', async (req, res) => {
   try {
     const members = await TeamMember.find().sort({ createdAt: -1 });
@@ -48,20 +53,26 @@ router.get('/team', async (req, res) => {
   }
 });
 
-// 🛠 PUT: Оновити учасника команди
+// ✏️ Оновити учасника
 router.put(
   '/team/:id',
   upload.single('image'),
   handlePhotoInput,
   async (req, res) => {
     const { id } = req.params;
-    const { firstName, lastName, position, photoUrl } = req.body;
+    const { firstName, lastName, position, photoUrl, cloudinaryPublicId } =
+      req.body;
 
     if (!firstName || !lastName || !position) {
       return res.status(400).json({ message: 'Всі поля обов’язкові' });
     }
 
     try {
+      const existingMember = await TeamMember.findById(id);
+      if (!existingMember) {
+        return res.status(404).json({ message: 'Учасника не знайдено' });
+      }
+
       const updatedData = {
         firstName,
         lastName,
@@ -70,10 +81,14 @@ router.put(
 
       if (req.photoSource === 'url') {
         updatedData.photoUrl = photoUrl;
-        updatedData.localPhotoPath = undefined;
+        updatedData.cloudinaryPublicId = undefined;
       } else if (req.photoSource === 'file') {
-        updatedData.localPhotoPath = req.body.photoFilePath;
-        updatedData.photoUrl = undefined;
+        // 🧹 Видаляємо старе зображення з Cloudinary
+        if (existingMember.cloudinaryPublicId) {
+          await deleteCloudinaryImage(existingMember.cloudinaryPublicId);
+        }
+        updatedData.photoUrl = req.body.cloudinaryUrl;
+        updatedData.cloudinaryPublicId = cloudinaryPublicId;
       }
 
       const updatedMember = await TeamMember.findByIdAndUpdate(
@@ -85,10 +100,6 @@ router.put(
         },
       );
 
-      if (!updatedMember) {
-        return res.status(404).json({ message: 'Учасника не знайдено' });
-      }
-
       res
         .status(200)
         .json({ message: 'Учасника оновлено успішно!', member: updatedMember });
@@ -99,7 +110,7 @@ router.put(
   },
 );
 
-// ❌ DELETE: Видалити учасника команди
+// ❌ Видалити учасника
 router.delete('/team/:id', async (req, res) => {
   const { id } = req.params;
 
@@ -107,6 +118,11 @@ router.delete('/team/:id', async (req, res) => {
     const deleted = await TeamMember.findByIdAndDelete(id);
     if (!deleted) {
       return res.status(404).json({ message: 'Учасника не знайдено' });
+    }
+
+    // 🧹 Видаляємо зображення з Cloudinary, якщо є
+    if (deleted.cloudinaryPublicId) {
+      await deleteCloudinaryImage(deleted.cloudinaryPublicId);
     }
 
     res.status(200).json({ message: 'Учасника успішно видалено' });

@@ -1,47 +1,52 @@
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
 
-// Створюємо директорію, якщо не існує
-const uploadDir = 'uploads/team';
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+// 🔧 Налаштування Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
+// 📦 Налаштування сховища Cloudinary
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'team', // 📁 Папка в Cloudinary
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+    transformation: [{ width: 800, crop: 'limit' }], // необов'язково: обмеження розміру
   },
 });
 
-export const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // Обмеження на розмір файлу (5MB)
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error('Неприпустимий тип файлу. Дозволені: jpg, png, webp.'));
-    }
-  },
-});
+// 📤 Multer middleware для завантаження файлу на Cloudinary
+export const upload = multer({ storage });
 
-// Додатковий middleware для обробки як URL, так і файла
+// ⚙️ Middleware для обробки фото (URL або файл)
 export const handlePhotoInput = (req, res, next) => {
   if (req.body.photoUrl) {
     req.photoSource = 'url';
-  } else if (req.file) {
+  } else if (req.file && req.file.path) {
     req.photoSource = 'file';
-    req.body.photoFilePath = `/uploads/team/${req.file.filename}`;
+    req.body.cloudinaryUrl = req.file.path; // Cloudinary повертає URL у file.path
+    req.body.cloudinaryPublicId = req.file.filename; // ⬅️ збережемо також публічний ID
   } else {
     return res
       .status(400)
       .json({ message: 'Необхідно надати photoUrl або фотофайл.' });
   }
   next();
+};
+
+// 🗑 Видалення зображення з Cloudinary за публічним ID
+export const deleteCloudinaryImage = async (publicId) => {
+  try {
+    if (!publicId) return;
+    await cloudinary.uploader.destroy(publicId);
+    console.log(`🗑 Видалено зображення Cloudinary: ${publicId}`);
+  } catch (err) {
+    console.error('❌ Помилка при видаленні зображення з Cloudinary:', err);
+  }
 };
