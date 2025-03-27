@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import testRoutes from './routes/testRoute.js';
 import createRouter from './routes/createRouter.js'; // ✅ ДОДАНО
 import { errorHandler } from './middleware/errorHandler.js';
+import projectRoutes from './routes/projectRoutes.js';
 
 dotenv.config();
 
@@ -16,7 +17,7 @@ app.use(express.json());
 // 📌 Підключення маршрутів
 app.use('/api', testRoutes);
 app.use('/api', createRouter); // ✅ ДОДАНО
-
+app.use('/api', projectRoutes);
 // Централізований обробник помилок
 app.use(errorHandler);
 
