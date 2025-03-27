@@ -14,21 +14,34 @@ router.post(
   upload.single('image'),
   handlePhotoInput,
   async (req, res) => {
-    const { firstName, lastName, position, photoUrl, cloudinaryPublicId } =
-      req.body;
+    const {
+      name,
+      position,
+      photoUrl,
+      cloudinaryPublicId,
+      facebook,
+      instagram,
+      linkedin,
+      twitter,
+    } = req.body;
 
-    if (!firstName || !lastName || !position) {
+    if (!name || !position) {
       return res.status(400).json({ message: 'Всі поля обов’язкові' });
     }
 
     try {
       const newMember = new TeamMember({
-        firstName,
-        lastName,
+        name,
         position,
         photoUrl: req.photoSource === 'url' ? photoUrl : req.body.cloudinaryUrl,
         cloudinaryPublicId:
           req.photoSource === 'file' ? cloudinaryPublicId : undefined,
+        socialLinks: {
+          facebook: facebook || '',
+          instagram: instagram || '',
+          linkedin: linkedin || '',
+          twitter: twitter || '',
+        },
       });
 
       await newMember.save();
@@ -60,10 +73,18 @@ router.put(
   handlePhotoInput,
   async (req, res) => {
     const { id } = req.params;
-    const { firstName, lastName, position, photoUrl, cloudinaryPublicId } =
-      req.body;
+    const {
+      name,
+      position,
+      photoUrl,
+      cloudinaryPublicId,
+      facebook,
+      instagram,
+      linkedin,
+      twitter,
+    } = req.body;
 
-    if (!firstName || !lastName || !position) {
+    if (!name || !position) {
       return res.status(400).json({ message: 'Всі поля обов’язкові' });
     }
 
@@ -74,16 +95,20 @@ router.put(
       }
 
       const updatedData = {
-        firstName,
-        lastName,
+        name,
         position,
+        socialLinks: {
+          facebook: facebook || existingMember.socialLinks?.facebook || '',
+          instagram: instagram || existingMember.socialLinks?.instagram || '',
+          linkedin: linkedin || existingMember.socialLinks?.linkedin || '',
+          twitter: twitter || existingMember.socialLinks?.twitter || '',
+        },
       };
 
       if (req.photoSource === 'url') {
         updatedData.photoUrl = photoUrl;
         updatedData.cloudinaryPublicId = undefined;
       } else if (req.photoSource === 'file') {
-        // 🧹 Видаляємо старе зображення з Cloudinary
         if (existingMember.cloudinaryPublicId) {
           await deleteCloudinaryImage(existingMember.cloudinaryPublicId);
         }
@@ -120,7 +145,6 @@ router.delete('/team/:id', async (req, res) => {
       return res.status(404).json({ message: 'Учасника не знайдено' });
     }
 
-    // 🧹 Видаляємо зображення з Cloudinary, якщо є
     if (deleted.cloudinaryPublicId) {
       await deleteCloudinaryImage(deleted.cloudinaryPublicId);
     }

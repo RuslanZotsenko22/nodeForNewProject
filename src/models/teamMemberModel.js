@@ -1,14 +1,8 @@
-// 📁 src/models/teamMemberModel.js
 import mongoose from 'mongoose';
 
 const teamMemberSchema = new mongoose.Schema(
   {
-    firstName: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    lastName: {
+    name: {
       type: String,
       required: true,
       trim: true,
@@ -19,10 +13,19 @@ const teamMemberSchema = new mongoose.Schema(
       trim: true,
     },
     photoUrl: {
-      type: String, // для завантаження через URL
+      type: String, // URL до фото
     },
     photoFilePath: {
-      type: String, // для локального шляху до завантаженого файлу
+      type: String, // для локального шляху (якщо використовувався)
+    },
+    cloudinaryPublicId: {
+      type: String, // для Cloudinary
+    },
+    socialLinks: {
+      facebook: { type: String, default: '' },
+      instagram: { type: String, default: '' },
+      linkedin: { type: String, default: '' },
+      twitter: { type: String, default: '' },
     },
   },
   { timestamps: true },
