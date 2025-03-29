@@ -10,7 +10,7 @@ const router = express.Router();
 
 // ➕ Додати проєкт
 router.post(
-  '/projects',
+  '/',
   uploadProjectImage.single('image'),
   handleProjectPhotoInput,
   async (req, res) => {
@@ -28,7 +28,7 @@ router.post(
         description,
         imageUrl: req.photoSource === 'url' ? imageUrl : req.body.cloudinaryUrl,
         cloudinaryPublicId:
-          req.photoSource === 'file' ? cloudinaryPublicId : undefined,
+          req.photoSource === 'file' ? req.body.cloudinaryPublicId : undefined,
       });
 
       await newProject.save();
@@ -43,7 +43,7 @@ router.post(
 );
 
 // 📤 Отримати всі проєкти
-router.get('/projects', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const projects = await Project.find().sort({ createdAt: -1 });
     res.status(200).json(projects);
@@ -55,7 +55,7 @@ router.get('/projects', async (req, res) => {
 
 // ✏️ Оновити проєкт
 router.put(
-  '/projects/:id',
+  '/:id',
   uploadProjectImage.single('image'),
   handleProjectPhotoInput,
   async (req, res) => {
@@ -101,7 +101,7 @@ router.put(
 );
 
 // ❌ Видалити проєкт
-router.delete('/projects/:id', async (req, res) => {
+router.delete('/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
