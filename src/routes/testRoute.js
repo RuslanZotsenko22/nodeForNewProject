@@ -4,7 +4,7 @@ import { Router } from 'express';
 
 const router = Router();
 
-router.post('/test', async (req, res) => {
+router.post('/', async (req, res) => {
   const { name, email, phone, message } = req.body;
 
   // Валідація

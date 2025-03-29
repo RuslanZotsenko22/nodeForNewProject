@@ -9,54 +9,49 @@ import {
 const router = express.Router();
 
 // ➕ Створити нового учасника
-router.post(
-  '/team',
-  upload.single('image'),
-  handlePhotoInput,
-  async (req, res) => {
-    const {
+router.post('/', upload.single('image'), handlePhotoInput, async (req, res) => {
+  const {
+    name,
+    position,
+    photoUrl,
+    cloudinaryPublicId,
+    facebook,
+    instagram,
+    linkedin,
+    twitter,
+  } = req.body;
+
+  if (!name || !position) {
+    return res.status(400).json({ message: 'Всі поля обов’язкові' });
+  }
+
+  try {
+    const newMember = new TeamMember({
       name,
       position,
-      photoUrl,
-      cloudinaryPublicId,
-      facebook,
-      instagram,
-      linkedin,
-      twitter,
-    } = req.body;
+      photoUrl: req.photoSource === 'url' ? photoUrl : req.body.cloudinaryUrl,
+      cloudinaryPublicId:
+        req.photoSource === 'file' ? cloudinaryPublicId : undefined,
+      socialLinks: {
+        facebook: facebook || '',
+        instagram: instagram || '',
+        linkedin: linkedin || '',
+        twitter: twitter || '',
+      },
+    });
 
-    if (!name || !position) {
-      return res.status(400).json({ message: 'Всі поля обов’язкові' });
-    }
-
-    try {
-      const newMember = new TeamMember({
-        name,
-        position,
-        photoUrl: req.photoSource === 'url' ? photoUrl : req.body.cloudinaryUrl,
-        cloudinaryPublicId:
-          req.photoSource === 'file' ? cloudinaryPublicId : undefined,
-        socialLinks: {
-          facebook: facebook || '',
-          instagram: instagram || '',
-          linkedin: linkedin || '',
-          twitter: twitter || '',
-        },
-      });
-
-      await newMember.save();
-      res
-        .status(201)
-        .json({ message: 'Учасника додано успішно!', member: newMember });
-    } catch (error) {
-      console.error('❌ Помилка при створенні члена команди:', error);
-      res.status(500).json({ message: 'Щось пішло не так!' });
-    }
-  },
-);
+    await newMember.save();
+    res
+      .status(201)
+      .json({ message: 'Учасника додано успішно!', member: newMember });
+  } catch (error) {
+    console.error('❌ Помилка при створенні члена команди:', error);
+    res.status(500).json({ message: 'Щось пішло не так!' });
+  }
+});
 
 // 📤 Отримати всіх учасників
-router.get('/team', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const members = await TeamMember.find().sort({ createdAt: -1 });
     res.status(200).json(members);
@@ -68,7 +63,7 @@ router.get('/team', async (req, res) => {
 
 // ✏️ Оновити учасника
 router.put(
-  '/team/:id',
+  '/:id',
   upload.single('image'),
   handlePhotoInput,
   async (req, res) => {
@@ -136,7 +131,7 @@ router.put(
 );
 
 // ❌ Видалити учасника
-router.delete('/team/:id', async (req, res) => {
+router.delete('/:id', async (req, res) => {
   const { id } = req.params;
 
   try {

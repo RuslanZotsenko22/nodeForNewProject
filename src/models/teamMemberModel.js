@@ -25,7 +25,7 @@ const teamMemberSchema = new mongoose.Schema(
       facebook: { type: String, default: '' },
       instagram: { type: String, default: '' },
       linkedin: { type: String, default: '' },
-      twitter: { type: String, default: '' },
+      whatsapp: { type: String, default: '' },
     },
   },
   { timestamps: true, versionKey: false },
