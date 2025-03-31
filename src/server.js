@@ -7,6 +7,7 @@ import testRoutes from './routes/testRoute.js';
 import createRouter from './routes/createRouter.js';
 import projectRoutes from './routes/projectRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import blogRoutes from './routes/blogRoutes.js';
 
 dotenv.config();
 
@@ -24,7 +25,7 @@ app.get('/api/test', (req, res) => {
 app.use('/api/projects', projectRoutes); // ➕ /api/projects/...
 app.use('/api/test', testRoutes); // ➕ /api/test/...
 app.use('/api/team', createRouter); // ➕ /api/create/...
-
+app.use('/api/blog', blogRoutes);
 // 🛠 Централізований обробник помилок
 app.use(errorHandler);
 
