@@ -18,13 +18,20 @@ const PORT = process.env.PORT || 5000;
 
 // 🔧 CORS з дозволом для фронтенду (локальний + продакшн)
 const allowedOrigins = [
-  'http://localhost:5173', // локальна розробка
-  'https://rrp-git-main-svitlanahavrylets-projects.vercel.app/admin', // 👉 заміни на реальний домен
+  'http://localhost:5173',
+  'https://rrp-git-main-svitlanahavrylets-projects.vercel.app',
+  'https://rrp-sandy.vercel.app',
 ];
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('CORS not allowed for this origin'));
+      }
+    },
     credentials: true,
   }),
 );
