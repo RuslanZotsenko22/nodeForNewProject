@@ -1,6 +1,7 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import { verifyAdminToken } from '../middleware/verifyAdmin.js'; // ⬅️ імпортуємо middleware
 
 dotenv.config();
 
@@ -24,6 +25,11 @@ router.post('/login', (req, res) => {
   });
 
   res.json({ token });
+});
+
+// ✅ GET /api/admin/protected — перевірка токена
+router.get('/protected', verifyAdminToken, (req, res) => {
+  res.status(200).json({ message: 'Токен дійсний. Ви авторизовані.' });
 });
 
 export default router;
