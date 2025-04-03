@@ -16,8 +16,19 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// 🔧 Middleware
-app.use(cors());
+// 🔧 CORS з дозволом для фронтенду (локальний + продакшн)
+const allowedOrigins = [
+  'http://localhost:5173', // локальна розробка
+  'https://rrp-git-main-svitlanahavrylets-projects.vercel.app/admin', // 👉 заміни на реальний домен
+];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  }),
+);
+
 app.use(express.json());
 
 // 📌 Перевірка, що сервер живий
