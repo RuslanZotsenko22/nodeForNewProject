@@ -5,10 +5,50 @@ import {
   handleBlogImage,
   deleteBlogImage,
 } from '../middleware/uploadBlog.js';
+import { verifyAdminToken } from '../middleware/verifyAdmin.js'; // ✅ додано
 
 const router = express.Router();
 
-// ➕ Створити пост
+// 📥 Отримати всі пости (з пагінацією) — ПУБЛІЧНО
+router.get('/', async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = 6;
+  const skip = (page - 1) * limit;
+
+  try {
+    const posts = await BlogPost.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+    const total = await BlogPost.countDocuments();
+
+    res.status(200).json({
+      posts,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+    });
+  } catch (error) {
+    console.error('❌ Помилка при отриманні постів:', error);
+    res.status(500).json({ message: 'Не вдалося отримати пости' });
+  }
+});
+
+// 📄 Отримати один пост — ПУБЛІЧНО
+router.get('/:id', async (req, res) => {
+  try {
+    const post = await BlogPost.findById(req.params.id);
+    if (!post) return res.status(404).json({ message: 'Пост не знайдено' });
+    res.status(200).json(post);
+  } catch (error) {
+    console.error('❌ Помилка при отриманні поста:', error);
+    res.status(500).json({ message: 'Не вдалося отримати пост' });
+  }
+});
+
+// 🛡 Захищаємо решту маршрутів
+router.use(verifyAdminToken);
+
+// ➕ Створити пост — ТІЛЬКИ ДЛЯ АДМІНА
 router.post(
   '/',
   uploadBlogImage.single('image'),
@@ -48,43 +88,7 @@ router.post(
   },
 );
 
-// 📥 Отримати всі пости (з пагінацією)
-router.get('/', async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = 6;
-  const skip = (page - 1) * limit;
-
-  try {
-    const posts = await BlogPost.find()
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
-    const total = await BlogPost.countDocuments();
-
-    res.status(200).json({
-      posts,
-      currentPage: page,
-      totalPages: Math.ceil(total / limit),
-    });
-  } catch (error) {
-    console.error('❌ Помилка при отриманні постів:', error);
-    res.status(500).json({ message: 'Не вдалося отримати пости' });
-  }
-});
-
-// 📄 Отримати один пост
-router.get('/:id', async (req, res) => {
-  try {
-    const post = await BlogPost.findById(req.params.id);
-    if (!post) return res.status(404).json({ message: 'Пост не знайдено' });
-    res.status(200).json(post);
-  } catch (error) {
-    console.error('❌ Помилка при отриманні поста:', error);
-    res.status(500).json({ message: 'Не вдалося отримати пост' });
-  }
-});
-
-// ✏️ Оновити пост
+// ✏️ Оновити пост — АДМІН
 router.put(
   '/:id',
   uploadBlogImage.single('image'),
@@ -121,7 +125,7 @@ router.put(
   },
 );
 
-// ❌ Видалити пост
+// ❌ Видалити пост — АДМІН
 router.delete('/:id', async (req, res) => {
   try {
     const post = await BlogPost.findByIdAndDelete(req.params.id);

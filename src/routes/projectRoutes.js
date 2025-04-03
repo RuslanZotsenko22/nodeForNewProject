@@ -5,8 +5,23 @@ import {
   handleProjectPhotoInput,
   deleteProjectImage,
 } from '../middleware/uploadProject.js';
+import { verifyAdminToken } from '../middleware/verifyAdmin.js'; // ✅ додано
 
 const router = express.Router();
+
+// 📤 Отримати всі проєкти — ПУБЛІЧНО
+router.get('/', async (req, res) => {
+  try {
+    const projects = await Project.find().sort({ createdAt: -1 });
+    res.status(200).json(projects);
+  } catch (error) {
+    console.error('❌ Помилка при отриманні проєктів:', error);
+    res.status(500).json({ message: 'Не вдалося завантажити проєкти' });
+  }
+});
+
+// 🛡 Захист усіх маршрутів нижче
+router.use(verifyAdminToken);
 
 // ➕ Додати проєкт
 router.post(
@@ -14,8 +29,7 @@ router.post(
   uploadProjectImage.single('image'),
   handleProjectPhotoInput,
   async (req, res) => {
-    const { title, category, description, imageUrl, cloudinaryPublicId } =
-      req.body;
+    const { title, category, description, imageUrl } = req.body;
 
     if (!title || !category || !description) {
       return res.status(400).json({ message: 'Всі поля обов’язкові' });
@@ -41,17 +55,6 @@ router.post(
     }
   },
 );
-
-// 📤 Отримати всі проєкти
-router.get('/', async (req, res) => {
-  try {
-    const projects = await Project.find().sort({ createdAt: -1 });
-    res.status(200).json(projects);
-  } catch (error) {
-    console.error('❌ Помилка при отриманні проєктів:', error);
-    res.status(500).json({ message: 'Не вдалося завантажити проєкти' });
-  }
-});
 
 // ✏️ Оновити проєкт
 router.put(

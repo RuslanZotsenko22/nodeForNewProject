@@ -5,8 +5,23 @@ import {
   handlePhotoInput,
   deleteCloudinaryImage,
 } from '../middleware/upload.js';
+import { verifyAdminToken } from '../middleware/verifyAdmin.js'; // 🔐 додано
 
 const router = express.Router();
+
+// 📤 Отримати всіх учасників — ПУБЛІЧНИЙ
+router.get('/', async (req, res) => {
+  try {
+    const members = await TeamMember.find().sort({ createdAt: -1 });
+    res.status(200).json(members);
+  } catch (error) {
+    console.error('❌ Помилка при отриманні членів команди:', error);
+    res.status(500).json({ message: 'Не вдалося завантажити дані' });
+  }
+});
+
+// 🛡 Захищаємо ВСІ МАРШРУТИ нижче
+router.use(verifyAdminToken);
 
 // ➕ Створити нового учасника
 router.post('/', upload.single('image'), handlePhotoInput, async (req, res) => {
@@ -47,17 +62,6 @@ router.post('/', upload.single('image'), handlePhotoInput, async (req, res) => {
   } catch (error) {
     console.error('❌ Помилка при створенні члена команди:', error);
     res.status(500).json({ message: 'Щось пішло не так!' });
-  }
-});
-
-// 📤 Отримати всіх учасників
-router.get('/', async (req, res) => {
-  try {
-    const members = await TeamMember.find().sort({ createdAt: -1 });
-    res.status(200).json(members);
-  } catch (error) {
-    console.error('❌ Помилка при отриманні членів команди:', error);
-    res.status(500).json({ message: 'Не вдалося завантажити дані' });
   }
 });
 

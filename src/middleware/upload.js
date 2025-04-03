@@ -17,7 +17,10 @@ const storage = new CloudinaryStorage({
   params: {
     folder: 'team', // 📁 Папка в Cloudinary
     allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    transformation: [{ width: 800, crop: 'limit' }], // необов'язково: обмеження розміру
+    transformation: [
+      { width: 800, crop: 'limit' },
+      { fetch_format: 'auto', quality: 'auto' },
+    ], // необов'язково: обмеження розміру
   },
 });
 
