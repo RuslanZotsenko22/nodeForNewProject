@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import cookieParser from 'cookie-parser';
 
 // 📦 Імпорт роутів
 import testRoutes from './routes/testRoute.js';
@@ -37,7 +38,7 @@ app.use(
 );
 
 app.use(express.json());
-
+app.use(cookieParser()); // ⬅️ Це обов'язково
 // 📌 Перевірка, що сервер живий
 app.get('/api/test', (req, res) => {
   res.json({ message: '✅ Server is working!' });

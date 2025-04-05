@@ -1,35 +1,22 @@
 import express from 'express';
-import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import { verifyAdminToken } from '../middleware/verifyAdmin.js'; // ⬅️ імпортуємо middleware
+import {
+  login,
+  refreshToken,
+  getProtectedData,
+} from '../controllers/adminController.js';
 
 dotenv.config();
 
 const router = express.Router();
 
-// 🔐 POST /api/admin/login
-router.post('/login', (req, res) => {
-  const { password } = req.body;
+// 🔐 POST /api/admin/login — логін з access + refresh токенами
+router.post('/login', login);
 
-  if (!password) {
-    return res.status(400).json({ message: 'Введіть пароль' });
-  }
+// ♻️ POST /api/admin/refresh — оновлення access токена через refresh токен з cookie
+router.post('/refresh', refreshToken);
 
-  if (password !== process.env.ADMIN_PANEL_PASSWORD) {
-    return res.status(401).json({ message: 'Невірний пароль' });
-  }
-
-  // 🔑 Генеруємо JWT токен
-  const token = jwt.sign({ isAdmin: true }, process.env.JWT_SECRET, {
-    expiresIn: '2h',
-  });
-
-  res.json({ token });
-});
-
-// ✅ GET /api/admin/protected — перевірка токена
-router.get('/protected', verifyAdminToken, (req, res) => {
-  res.status(200).json({ message: 'Токен дійсний. Ви авторизовані.' });
-});
+// ✅ GET /api/admin/protected — перевірка access токена
+router.get('/protected', getProtectedData);
 
 export default router;
