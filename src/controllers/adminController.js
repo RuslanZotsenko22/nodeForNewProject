@@ -5,14 +5,14 @@ dotenv.config();
 
 // 🔐 Створення access токена
 const generateAccessToken = (adminId) => {
-  return jwt.sign({ adminId }, process.env.ACCESS_SECRET, {
+  return jwt.sign({ adminId, isAdmin: true }, process.env.ACCESS_SECRET, {
     expiresIn: process.env.ACCESS_EXPIRES || '15m',
   });
 };
 
 // ♻️ Створення refresh токена
 const generateRefreshToken = (adminId) => {
-  return jwt.sign({ adminId }, process.env.REFRESH_SECRET, {
+  return jwt.sign({ adminId, isAdmin: true }, process.env.REFRESH_SECRET, {
     expiresIn: process.env.REFRESH_EXPIRES || '7d',
   });
 };
