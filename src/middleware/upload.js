@@ -36,9 +36,9 @@ export const handlePhotoInput = (req, res, next) => {
     req.body.cloudinaryUrl = req.file.path; // Cloudinary повертає URL у file.path
     req.body.cloudinaryPublicId = req.file.filename; // ⬅️ збережемо також публічний ID
   } else {
-    return res
-      .status(400)
-      .json({ message: 'Необхідно надати photoUrl або фотофайл.' });
+    return res.status(400).json({
+      message: 'Je nutné poskytnout photoUrl nebo soubor s fotografií.',
+    });
   }
   next();
 };
@@ -48,8 +48,8 @@ export const deleteCloudinaryImage = async (publicId) => {
   try {
     if (!publicId) return;
     await cloudinary.uploader.destroy(publicId);
-    console.log(`🗑 Видалено зображення Cloudinary: ${publicId}`);
+    console.log(`🗑 Obrázek byl odstraněn z Cloudinary: ${publicId}`);
   } catch (err) {
-    console.error('❌ Помилка при видаленні зображення з Cloudinary:', err);
+    console.error('❌ Chyba při odstraňování obrázku z Cloudinary:', err);
   }
 };

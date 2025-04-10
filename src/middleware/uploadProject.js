@@ -10,7 +10,9 @@ export const uploadProjectImage = multer({
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Неприпустимий тип файлу. Дозволено: JPEG, PNG, WEBP'));
+      cb(
+        new Error('Nepovolený typ souboru. Povolené formáty: JPEG, PNG, WEBP'),
+      );
     }
   },
 });
@@ -24,9 +26,9 @@ export const handleProjectPhotoInput = (req, res, next) => {
     req.body.cloudinaryUrl = req.file.path;
     req.body.cloudinaryPublicId = req.file.filename;
   } else {
-    return res
-      .status(400)
-      .json({ message: 'Необхідно надати imageUrl або фотофайл.' });
+    return res.status(400).json({
+      message: 'Je nutné poskytnout imageUrl nebo soubor s fotografií.',
+    });
   }
   next();
 };
@@ -36,9 +38,11 @@ export const deleteProjectImage = async (publicId) => {
   try {
     const result = await cloudinary.uploader.destroy(publicId);
     if (result.result !== 'ok') {
-      console.warn('⚠️ Cloudinary: Зображення не видалено або вже не існує.');
+      console.warn(
+        '⚠️ Cloudinary: Obrázek nebyl odstraněn nebo již neexistuje.',
+      );
     }
   } catch (error) {
-    console.error('❌ Помилка при видаленні зображення з Cloudinary:', error);
+    console.error('❌ Chyba při odstraňování obrázku z Cloudinary:', error);
   }
 };

@@ -4,6 +4,9 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 
+// 📚 Swagger API Docs
+import { swaggerDocs } from './swagger.js';
+
 // 📦 Імпорт роутів
 import testRoutes from './routes/testRoute.js';
 import createRouter from './routes/createRouter.js';
@@ -17,7 +20,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// 🔧 CORS з дозволом для фронтенду (локальний + продакшн)
+// 🔧 CORS з дозволом для фронтенду
 const allowedOrigins = [
   'http://localhost:5173',
   'https://rrp-git-main-svitlanahavrylets-projects.vercel.app',
@@ -38,7 +41,7 @@ app.use(
 );
 
 app.use(express.json());
-app.use(cookieParser()); // ⬅️ Це обов'язково
+app.use(cookieParser());
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
@@ -49,10 +52,13 @@ app.use((req, res, next) => {
   );
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   if (req.method === 'OPTIONS') {
-    return res.sendStatus(200); // швидка відповідь на preflight
+    return res.sendStatus(200);
   }
   next();
 });
+
+// 📚 Swagger запуск
+swaggerDocs(app);
 
 // 📌 Перевірка, що сервер живий
 app.get('/api/test', (req, res) => {

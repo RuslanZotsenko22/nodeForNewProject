@@ -1,3 +1,10 @@
+/**
+ * @swagger
+ * tags:
+ *   name: Блог
+ *   description: API для керування блог-постами
+ */
+
 import express from 'express';
 import BlogPost from '../models/blogModel.js';
 import {
@@ -5,11 +12,28 @@ import {
   handleBlogImage,
   deleteBlogImage,
 } from '../middleware/uploadBlog.js';
-import { verifyAdminToken } from '../middleware/verifyAdmin.js'; // ✅ додано
+import { verifyAdminToken } from '../middleware/verifyAdmin.js';
 
 const router = express.Router();
 
-// 📥 Отримати всі пости (з пагінацією) — ПУБЛІЧНО
+/**
+ * @swagger
+ * /api/blog:
+ *   get:
+ *     summary: Отримати всі пости (з пагінацією)
+ *     tags: [Блог]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Номер сторінки (за замовчуванням 1)
+ *     responses:
+ *       200:
+ *         description: Список постів
+ *       500:
+ *         description: Помилка сервера
+ */
 router.get('/', async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = 6;
@@ -28,27 +52,84 @@ router.get('/', async (req, res) => {
       totalPages: Math.ceil(total / limit),
     });
   } catch (error) {
-    console.error('❌ Помилка при отриманні постів:', error);
-    res.status(500).json({ message: 'Не вдалося отримати пости' });
+    res.status(500).json({ message: 'Nepodařilo se načíst příspěvky' });
   }
 });
 
-// 📄 Отримати один пост — ПУБЛІЧНО
+/**
+ * @swagger
+ * /api/blog/{id}:
+ *   get:
+ *     summary: Отримати один пост за ID
+ *     tags: [Блог]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID поста
+ *     responses:
+ *       200:
+ *         description: Успішно отримано пост
+ *       404:
+ *         description: Пост не знайдено
+ */
 router.get('/:id', async (req, res) => {
   try {
     const post = await BlogPost.findById(req.params.id);
-    if (!post) return res.status(404).json({ message: 'Пост не знайдено' });
+    if (!post)
+      return res.status(404).json({ message: 'Příspěvek nebyl nalezen' });
     res.status(200).json(post);
   } catch (error) {
-    console.error('❌ Помилка при отриманні поста:', error);
-    res.status(500).json({ message: 'Не вдалося отримати пост' });
+    res.status(500).json({ message: 'Nepodařilo se načíst příspěvek' });
   }
 });
 
-// 🛡 Захищаємо решту маршрутів
 router.use(verifyAdminToken);
 
-// ➕ Створити пост — ТІЛЬКИ ДЛЯ АДМІНА
+/**
+ * @swagger
+ * /api/blog:
+ *   post:
+ *     summary: Створити новий пост
+ *     tags: [Блог]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - title
+ *               - category
+ *               - date
+ *               - description
+ *               - image
+ *             properties:
+ *               title:
+ *                 type: string
+ *               category:
+ *                 type: string
+ *               date:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               youtubeLink:
+ *                 type: string
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: Пост створено
+ *       400:
+ *         description: Некоректні дані
+ *       500:
+ *         description: Помилка сервера
+ */
 router.post(
   '/',
   uploadBlogImage.single('image'),
@@ -65,7 +146,7 @@ router.post(
     } = req.body;
 
     if (!title || !category || !date || !description || !imageUrl) {
-      return res.status(400).json({ message: 'Усі поля обов’язкові' });
+      return res.status(400).json({ message: 'Všechna pole jsou povinná' });
     }
 
     try {
@@ -80,15 +161,59 @@ router.post(
       });
 
       await newPost.save();
-      res.status(201).json({ message: 'Пост створено!', post: newPost });
+      res.status(201).json({
+        message: 'Příspěvek byl úspěšně vytvořen!',
+        post: newPost,
+      });
     } catch (error) {
-      console.error('❌ Помилка при створенні поста:', error);
-      res.status(500).json({ message: 'Не вдалося створити пост' });
+      res.status(500).json({ message: 'Nepodařilo se vytvořit příspěvek' });
     }
   },
 );
 
-// ✏️ Оновити пост — АДМІН
+/**
+ * @swagger
+ * /api/blog/{id}:
+ *   put:
+ *     summary: Оновити пост
+ *     tags: [Блог]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID поста
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               category:
+ *                 type: string
+ *               date:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               youtubeLink:
+ *                 type: string
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Пост оновлено
+ *       404:
+ *         description: Пост не знайдено
+ *       500:
+ *         description: Помилка сервера
+ */
 router.put(
   '/:id',
   uploadBlogImage.single('image'),
@@ -96,7 +221,8 @@ router.put(
   async (req, res) => {
     try {
       const post = await BlogPost.findById(req.params.id);
-      if (!post) return res.status(404).json({ message: 'Пост не знайдено' });
+      if (!post)
+        return res.status(404).json({ message: 'Příspěvek nebyl nalezen' });
 
       if (post.cloudinaryPublicId) {
         await deleteBlogImage(post.cloudinaryPublicId);
@@ -117,28 +243,50 @@ router.put(
         },
       );
 
-      res.status(200).json({ message: 'Пост оновлено!', post: updated });
+      res
+        .status(200)
+        .json({ message: 'Příspěvek byl aktualizován!', post: updated });
     } catch (error) {
-      console.error('❌ Помилка при оновленні поста:', error);
-      res.status(500).json({ message: 'Не вдалося оновити пост' });
+      res.status(500).json({ message: 'Nepodařilo se aktualizovat příspěvek' });
     }
   },
 );
 
-// ❌ Видалити пост — АДМІН
+/**
+ * @swagger
+ * /api/blog/{id}:
+ *   delete:
+ *     summary: Видалити пост
+ *     tags: [Блог]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID поста
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Пост видалено
+ *       404:
+ *         description: Пост не знайдено
+ *       500:
+ *         description: Помилка сервера
+ */
 router.delete('/:id', async (req, res) => {
   try {
     const post = await BlogPost.findByIdAndDelete(req.params.id);
-    if (!post) return res.status(404).json({ message: 'Пост не знайдено' });
+    if (!post) return res.status(404).json({ message: 'Příspěvek nenalezen' });
 
     if (post.cloudinaryPublicId) {
       await deleteBlogImage(post.cloudinaryPublicId);
     }
 
-    res.status(200).json({ message: 'Пост видалено' });
+    res.status(200).json({ message: 'Příspěvek byl odstraněn' });
   } catch (error) {
-    console.error('❌ Помилка при видаленні поста:', error);
-    res.status(500).json({ message: 'Не вдалося видалити пост' });
+    res.status(500).json({ message: 'Nepodařilo se odstranit příspěvek' });
   }
 });
 

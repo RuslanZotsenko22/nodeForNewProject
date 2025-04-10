@@ -4,7 +4,7 @@ export const verifyAdminToken = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
 
   if (!token) {
-    return res.status(401).json({ message: 'Немає токена' });
+    return res.status(401).json({ message: 'Token chybí' });
   }
 
   try {
@@ -12,9 +12,9 @@ export const verifyAdminToken = (req, res, next) => {
     if (decoded.isAdmin) {
       next();
     } else {
-      return res.status(403).json({ message: 'Доступ заборонено' });
+      return res.status(403).json({ message: 'Přístup odepřen' });
     }
   } catch (err) {
-    return res.status(403).json({ message: 'Недійсний токен' });
+    return res.status(403).json({ message: 'Neplatný token' });
   }
 };

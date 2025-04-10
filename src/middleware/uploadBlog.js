@@ -25,7 +25,7 @@ export const uploadBlogImage = multer({
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Неприпустимий тип файлу. Дозволено: JPEG, PNG, WEBP'));
+      cb(new Error('Nepovolený typ souboru. Povoleno: JPEG, PNG, WEBP'));
     }
   },
 });
@@ -36,18 +36,26 @@ export const handleBlogImage = (req, res, next) => {
     req.body.cloudinaryPublicId = req.file.filename;
     next();
   } else {
-    return res.status(400).json({ message: 'Зображення обов’язкове' });
+    return res.status(400).json({ message: 'Obrázek je povinný' });
   }
 };
 
 export const deleteBlogImage = async (publicId) => {
-  if (!publicId) return;
+  if (!publicId) return false;
   try {
     const result = await cloudinary.uploader.destroy(publicId);
-    if (result.result !== 'ok') {
-      console.warn('⚠️ Зображення не видалено або вже не існує.');
+    if (result.result === 'ok') {
+      console.log('✅ Obrázek úspěšně odstraněn.');
+      return true;
+    } else if (result.result === 'not found') {
+      console.warn('⚠️ Obrázek nenalezen — mohl být odstraněn dříve.');
+      return false;
+    } else {
+      console.warn('⚠️ Neznámá odpověď od Cloudinary:', result);
+      return false;
     }
   } catch (err) {
-    console.error('❌ Помилка при видаленні зображення з Cloudinary:', err);
+    console.error('❌ Chyba při odstraňování obrázku z Cloudinary:', err);
+    return false;
   }
 };

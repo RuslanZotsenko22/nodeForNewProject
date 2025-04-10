@@ -10,10 +10,10 @@ if (
   !process.env.EMAIL_PASS ||
   !process.env.OWNER_EMAIL
 ) {
-  console.error('❌ Помилка: відсутні необхідні змінні середовища!');
-  console.log('EMAIL_USER:', process.env.EMAIL_USER || '❌ Відсутній');
-  console.log('EMAIL_PASS:', process.env.EMAIL_PASS ? '✔️ Є' : '❌ Відсутній');
-  console.log('OWNER_EMAIL:', process.env.OWNER_EMAIL || '❌ Відсутній');
+  console.error('❌ Chyba: chybí potřebné proměnné prostředí!');
+  console.log('EMAIL_USER:', process.env.EMAIL_USER || '❌ Chybí');
+  console.log('EMAIL_PASS:', process.env.EMAIL_PASS ? '✔️ Є' : '❌ Chybí');
+  console.log('OWNER_EMAIL:', process.env.OWNER_EMAIL || '❌ Chybí');
   process.exit(1);
 }
 
@@ -25,6 +25,18 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// 🕒 Таймаут-обгортка для завислої SMTP-відправки
+const withTimeout = (promise, ms) => {
+  const timeout = new Promise((_, reject) =>
+    setTimeout(
+      () => reject(new Error('⏰ Email odesílání trvalo příliš dlouho!')),
+      ms,
+    ),
+  );
+  return Promise.race([promise, timeout]);
+};
+
+// 📨 Головна функція відправки emailів
 export const sendEmails = async (
   clientEmail,
   clientName,
@@ -33,14 +45,14 @@ export const sendEmails = async (
 ) => {
   try {
     if (!clientEmail || !clientName || !clientPhone || !clientMessage) {
-      throw new Error('❌ Відсутні необхідні параметри для відправки email!');
+      throw new Error('❌ Chybí potřebné parametry pro odeslání emailu!');
     }
 
     // 📩 Повідомлення для клієнта
     const clientMailOptions = {
       from: process.env.EMAIL_USER,
       to: clientEmail,
-      subject: '✅ Váš požadavek byl úspěšně přijat.!',
+      subject: '✅ Váš požadavek byl úspěšně přijat.',
       text: `Dobrý den, ${clientName}! Děkujeme za vaši žádost...`,
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; text-align: center;">
@@ -59,7 +71,7 @@ export const sendEmails = async (
       attachments: [
         {
           filename: 'logo.png',
-          path: path.resolve('src/assets/logo.png.png'), // 👈 переконайся, що шлях правильний
+          path: path.resolve('src/assets/logo.png.png'), // перевір ще раз шлях!
           cid: 'logo',
         },
       ],
@@ -81,9 +93,10 @@ ${clientMessage}
 📅 Datum odeslání: ${new Date().toLocaleString()}`,
     };
 
+    // ⏳ Відправка з таймаутом 7 сек
     await Promise.all([
-      transporter.sendMail(clientMailOptions),
-      transporter.sendMail(ownerMailOptions),
+      withTimeout(transporter.sendMail(clientMailOptions), 7000),
+      withTimeout(transporter.sendMail(ownerMailOptions), 7000),
     ]);
 
     console.log(
@@ -91,8 +104,8 @@ ${clientMessage}
     );
     return true;
   } catch (error) {
-    console.error('❌ Помилка при відправці email:', error.message);
-    if (error.response) console.error('📩 SMTP Відповідь:', error.response);
+    console.error('❌ Chyba při odesílání emailu:', error.message);
+    if (error.response) console.error('📩 Odpověď SMTP:', error.response);
     return false;
   }
 };

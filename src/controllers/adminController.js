@@ -22,11 +22,11 @@ export const login = (req, res) => {
   const { password } = req.body;
 
   if (!password) {
-    return res.status(400).json({ message: 'Введіть пароль' });
+    return res.status(400).json({ message: 'Zadejte heslo' });
   }
 
   if (password !== process.env.ADMIN_PANEL_PASSWORD) {
-    return res.status(401).json({ message: 'Невірний пароль' });
+    return res.status(401).json({ message: 'Neplatné heslo' });
   }
 
   const adminId = process.env.ADMIN_ID || 'admin'; // або з бази, або статичне значення
@@ -49,7 +49,7 @@ export const refreshToken = (req, res) => {
   const tokenFromCookie = req.cookies.refreshToken;
 
   if (!tokenFromCookie) {
-    return res.status(401).json({ message: 'Refresh токен відсутній' });
+    return res.status(401).json({ message: 'Chybí obnovovací token' });
   }
 
   try {
@@ -60,7 +60,7 @@ export const refreshToken = (req, res) => {
   } catch (error) {
     res
       .status(403)
-      .json({ message: 'Невірний або протермінований refresh токен' });
+      .json({ message: 'Neplatný nebo vypršený obnovovací token' });
   }
 };
 
@@ -69,14 +69,14 @@ export const getProtectedData = (req, res) => {
   const authHeader = req.headers.authorization;
   const token = authHeader?.split(' ')[1];
 
-  if (!token) return res.status(401).json({ message: 'Токен відсутній' });
+  if (!token) return res.status(401).json({ message: 'Token chybí' });
 
   try {
     const decoded = jwt.verify(token, process.env.ACCESS_SECRET);
     res
       .status(200)
-      .json({ message: 'Доступ дозволено', adminId: decoded.adminId });
+      .json({ message: 'Přístup povolen', adminId: decoded.adminId });
   } catch (error) {
-    res.status(401).json({ message: 'Невірний або протермінований токен' });
+    res.status(401).json({ message: 'Neplatný nebo vypršený token' });
   }
 };
