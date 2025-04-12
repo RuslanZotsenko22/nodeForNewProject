@@ -31,6 +31,7 @@ router.get('/', async (req, res) => {
   }
 });
 
+// 🛡 Захищені маршрути
 router.use(verifyAdminToken);
 
 /**
@@ -59,7 +60,7 @@ router.use(verifyAdminToken);
  *                 type: string
  *               linkedin:
  *                 type: string
- *               twitter:
+ *               whatsapp:
  *                 type: string
  *     security:
  *       - bearerAuth: []
@@ -80,7 +81,7 @@ router.post('/', upload.single('image'), handlePhotoInput, async (req, res) => {
     facebook,
     instagram,
     linkedin,
-    twitter,
+    whatsapp,
   } = req.body;
 
   if (!name || !position) {
@@ -98,7 +99,7 @@ router.post('/', upload.single('image'), handlePhotoInput, async (req, res) => {
         facebook: facebook || '',
         instagram: instagram || '',
         linkedin: linkedin || '',
-        twitter: twitter || '',
+        whatsapp: whatsapp || '',
       },
     });
 
@@ -145,7 +146,7 @@ router.post('/', upload.single('image'), handlePhotoInput, async (req, res) => {
  *                 type: string
  *               linkedin:
  *                 type: string
- *               twitter:
+ *               whatsapp:
  *                 type: string
  *     security:
  *       - bearerAuth: []
@@ -171,7 +172,7 @@ router.put(
       facebook,
       instagram,
       linkedin,
-      twitter,
+      whatsapp,
     } = req.body;
 
     if (!name || !position) {
@@ -191,7 +192,7 @@ router.put(
           facebook: facebook || existingMember.socialLinks?.facebook || '',
           instagram: instagram || existingMember.socialLinks?.instagram || '',
           linkedin: linkedin || existingMember.socialLinks?.linkedin || '',
-          twitter: twitter || existingMember.socialLinks?.twitter || '',
+          whatsapp: whatsapp || existingMember.socialLinks?.whatsapp || '',
         },
       };
 
