@@ -4,10 +4,10 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 
-// 📚 Swagger API Docs
+//  Swagger API Docs
 import { swaggerDocs } from './swagger.js';
 
-// 📦 Імпорт роутів
+//  Імпорт роутів
 import testRoutes from './routes/testRoute.js';
 import createRouter from './routes/createRouter.js';
 import projectRoutes from './routes/projectRoutes.js';
@@ -20,7 +20,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// 🔧 CORS з дозволом для фронтенду
+//  CORS з дозволом для фронтенду
 const allowedOrigins = [
   'http://localhost:5173',
   'https://rrp-git-main-svitlanahavrylets-projects.vercel.app',
@@ -57,7 +57,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// 📚 Swagger запуск
+//  Swagger запуск
 swaggerDocs(app);
 
 // 📌 Перевірка, що сервер живий
@@ -65,17 +65,17 @@ app.get('/api/test', (req, res) => {
   res.json({ message: '✅ Server is working!' });
 });
 
-// 🚏 Роути
+//  Роути
 app.use('/api/test', testRoutes);
 app.use('/api/team', createRouter);
 app.use('/api/projects', projectRoutes);
 app.use('/api/blog', blogRoutes);
 app.use('/api/admin', adminAuthRoutes);
 
-// 🛠 Централізований обробник помилок
+// Централізований обробник помилок
 app.use(errorHandler);
 
-// 🔌 Підключення до MongoDB
+//  Підключення до MongoDB
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {

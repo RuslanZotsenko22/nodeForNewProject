@@ -3,7 +3,7 @@ import swaggerUi from 'swagger-ui-express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// 🧠 Отримуємо абсолютний шлях
+//  Отримуємо абсолютний шлях
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -22,13 +22,13 @@ const swaggerDefinition = {
   ],
 };
 
-// ✅ Шлях до всіх .js файлів у routes, включаючи вкладені
+//  Шлях до всіх .js файлів у routes, включаючи вкладені
 const options = {
   swaggerDefinition,
   apis: [path.join(__dirname, './routes/**/*.js')],
 };
 
-// 🧪 Перевірка, чи Swagger бачить файли
+//  Перевірка, чи Swagger бачить файли
 console.log('🔍 Swagger шукає в:', path.join(__dirname, './routes/**/*.js'));
 
 const swaggerSpec = swaggerJSDoc(options);

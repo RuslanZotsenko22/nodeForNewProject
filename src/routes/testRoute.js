@@ -5,7 +5,7 @@ import rateLimit from 'express-rate-limit';
 
 const router = Router();
 
-// 🛡️ Захист: обмеження 1 запит/хвилину з IP
+//  Захист: обмеження 1 запит/хвилину з IP
 const formLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 хвилина
   max: 1, // 1 запит

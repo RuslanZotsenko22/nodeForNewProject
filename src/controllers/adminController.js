@@ -3,21 +3,21 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// 🔐 Створення access токена
+//  Створення access токена
 const generateAccessToken = (adminId) => {
   return jwt.sign({ adminId, isAdmin: true }, process.env.ACCESS_SECRET, {
     expiresIn: process.env.ACCESS_EXPIRES || '15m',
   });
 };
 
-// ♻️ Створення refresh токена
+//  Створення refresh токена
 const generateRefreshToken = (adminId) => {
   return jwt.sign({ adminId, isAdmin: true }, process.env.REFRESH_SECRET, {
     expiresIn: process.env.REFRESH_EXPIRES || '7d',
   });
 };
 
-// 🔑 POST /api/admin/login
+//  POST /api/admin/login
 export const login = (req, res) => {
   const { password } = req.body;
 
@@ -44,7 +44,7 @@ export const login = (req, res) => {
   res.status(200).json({ token: accessToken });
 };
 
-// 🔁 POST /api/admin/refresh
+// POST /api/admin/refresh
 export const refreshToken = (req, res) => {
   const tokenFromCookie = req.cookies.refreshToken;
 
@@ -64,7 +64,7 @@ export const refreshToken = (req, res) => {
   }
 };
 
-// 🔐 GET /api/admin/protected
+//  GET /api/admin/protected
 export const getProtectedData = (req, res) => {
   const authHeader = req.headers.authorization;
   const token = authHeader?.split(' ')[1];
