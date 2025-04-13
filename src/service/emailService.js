@@ -49,7 +49,7 @@ export const sendEmails = async (
     }
 
     const clientMailOptions = {
-      from: `"RRP Team" <${process.env.EMAIL_USER}>`,
+      from: `"RRP s.r.o." <${process.env.EMAIL_USER}>`,
       to: clientEmail,
       subject: '✅ Váš požadavek byl úspěšně přijat.',
       text: `Dobrý den, ${clientName}! Děkujeme za vaši žádost...`,
@@ -72,7 +72,7 @@ export const sendEmails = async (
     };
 
     const ownerMailOptions = {
-      from: `"RRP Team" <${process.env.EMAIL_USER}>`,
+      from: `"RRP s.r.o." <${process.env.EMAIL_USER}>`,
       to: process.env.OWNER_EMAIL,
       subject: 'Nová žádost od klienta.',
       text: `
