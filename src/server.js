@@ -25,6 +25,8 @@ const allowedOrigins = [
   'http://localhost:5173',
   'https://rrp-git-main-svitlanahavrylets-projects.vercel.app',
   'https://rrp-sandy.vercel.app',
+  'https://rrp-frontend.vercel.app',
+  'https://rrp-it.cz',
 ];
 
 app.use(
