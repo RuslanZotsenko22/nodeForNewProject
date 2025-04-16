@@ -27,19 +27,10 @@ const allowedOrigins = [
   'https://rrp-frontend.vercel.app',
 ];
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.warn(`❌ CORS відхилено для origin: ${origin}`);
-        callback(new Error('CORS not allowed for this origin'));
-      }
-    },
-    credentials: true,
-  }),
-);
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+}));
 
 app.use(express.json());
 app.use(cookieParser());
