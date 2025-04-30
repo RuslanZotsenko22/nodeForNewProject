@@ -1,89 +1,94 @@
-# 📄 Project: RRP Backend API
+
+# 🛠️ RRPBackend
 
 🔗 [Website link](https://rrp-it.cz)
 
-This is the backend part of the corporate website for RRP — a company that provides IT solutions.  
-The main goal is to deliver a stable API for managing site content (projects, blog, team members) and to include a basic admin panel with authentication.
+## 📌 Description
+This is the backend part of a system for managing repair and renovation projects (**Repair & Renovation Projects**). The service provides full CRUD functionality for managing team members and completed projects, ensures secure access to the admin panel via token-based authentication, and supports image uploading to Cloudinary.
+
+## 🧰 Tech Stack
+- **Node.js**
+- **Express**
+- **MongoDB + Mongoose**
+- **Multer** — for file handling
+- **Cloudinary** — for image storage
+- **JWT (Access + Refresh tokens)** — for authentication
+- **CORS, dotenv, cookie-parser** — utility libraries
+
+## 📁 Main Features
+- 🔐 **Admin authentication** using JWT (access + refresh tokens)
+- 👥 **Team management** (CRUD: create, update, delete, view)
+- 🏗️ **Project management** (CRUD: create, update, delete, view)
+- 🖼️ Support for **image uploads** via URL or local file
+- ☁️ **Cloudinary integration**
+- 🛡️ Secure `/admin` route with token protection
+
+## 📦 Project Structure
+```
+/controllers
+  - adminController.js
+  - projectController.js
+  - teamController.js
+
+/routes
+  - adminRoutes.js
+  - projectRoutes.js
+  - teamRoutes.js
+
+/middlewares
+  - authMiddleware.js
+  - uploadMiddleware.js
+
+/models
+  - Admin.js
+  - Project.js
+  - Team.js
+
+/utils
+  - cloudinary.js
+  - tokenService.js
+
+.env (environment variables)
+```
+
+## 🔐 Authentication
+- Login with password generates **JWT access-token** and **refresh-token**
+- **Refresh-token** is stored in **HttpOnly cookie**
+- Includes `/refresh-token` route to update access token
+
+## 🚀 How to Run Locally
+
+1. Clone the repository:
+```bash
+git clone https://github.com/RuslanZotsenko22/RRPBackend.git
+```
+
+2. Navigate to the project folder:
+```bash
+cd RRPBackend
+```
+
+3. Install dependencies:
+```bash
+npm install
+```
+
+4. Create a `.env` file and add the environment variables:
+```
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+ADMIN_PASSWORD=your_admin_password
+```
+
+5. Run the server:
+```bash
+npm run dev
+```
 
 ---
 
-## 🔧 Features implemented
-
-- Admin authentication using JWT tokens  
-- CRUD operations for:
-  - Blog posts
-  - Team members
-  - Company projects  
-- Image uploading to Cloudinary  
-- Email notifications sent via Nodemailer  
-- API documentation available via Swagger  
-
----
-
-## 🧰 Tech stack
-
-- Node.js + Express  
-- MongoDB + Mongoose  
-- Cloudinary (image management)  
-- Nodemailer (email service)  
-- JWT (authentication)  
-- Swagger (API documentation)  
-
----
-
-## 👨‍💻 My role
-
-- Built the backend architecture from scratch  
-- Designed and implemented RESTful APIs  
-- Integrated MongoDB and designed schemas  
-- Developed secure admin login functionality  
-- Tested endpoints with Postman and Swagger  
-
-
-
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-
----
-
-# 📄 Проєкт: RRP Backend API
-
-🔗 [Посилання на сайт](https://rrp-it.cz)
-
-Це backend-частина корпоративного сайту компанії RRP, яка надає IT-послуги.  
-Основна мета — забезпечити надійний API для керування контентом на сайті (проєкти, блог, команда), а також реалізувати базову адмін-панель з авторизацією.
-
----
-
-## 🔧 Реалізовані функції
-
-- Авторизація адміністратора через JWT  
-- CRUD-операції для:
-  - Блогових статей
-  - Учасників команди
-  - Компанійських проєктів  
-- Завантаження зображень на Cloudinary  
-- Відправка email-повідомлень через Nodemailer  
-- Swagger-документація для API  
-
----
-
-## 🧰 Технології
-
-- Node.js + Express  
-- MongoDB + Mongoose  
-- Cloudinary (керування зображеннями)  
-- Nodemailer (поштова служба)  
-- JWT (автентифікація)  
-- Swagger (API-документація)  
-
----
-
-## 👨‍💻 Моя роль
-
-- Побудова бекенд-архітектури з нуля  
-- Реалізація RESTful API  
-- Робота з MongoDB, проєктування схем  
-- Реалізація захищеної авторизації для адміністратора  
-- Тестування API через Postman та Swagger  
+Author: [Ruslan Zotsenko](https://github.com/RuslanZotsenko22) 🚀
