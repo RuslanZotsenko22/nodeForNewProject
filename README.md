@@ -2,47 +2,28 @@
 This is the backend part of the corporate website for RRP — a company that provides IT solutions. The main goal is to deliver a stable API for managing site content (projects, blog, team members) and to include a basic admin panel with authentication.
 
 🔧 Features implemented:
-
 Admin authentication using JWT tokens
-
 Create, update, and delete operations for:
-
 Blog posts
-
 Team members
-
 Company projects
-
 Image uploading to Cloudinary
-
 Email notifications sent to the client and the company owner via Nodemailer
-
 API documentation via Swagger – for easy testing and reference
 
 🧱 Tech stack:
-
 Node.js + Express
-
 MongoDB + Mongoose
-
 Cloudinary (image management)
-
 Nodemailer (email service)
-
 JWT (authentication)
-
 Swagger (API docs)
 
 👨‍💻 My role:
-
 Built the backend architecture from scratch
-
 Designed and implemented RESTful APIs
-
 Integrated MongoDB and designed schemas
-
 Developed secure admin login functionality
-
 Tested all endpoints with Postman and Swagger
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
