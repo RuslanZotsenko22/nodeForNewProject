@@ -1,30 +1,47 @@
-📄 Project: RRP Backend API ( https://rrp-it.cz/ )
-This is the backend part of the corporate website for RRP — a company that provides IT solutions. The main goal is to deliver a stable API for managing site content (projects, blog, team members) and to include a basic admin panel with authentication.
+# 📄 Project: RRP Backend API
 
-🔧 Features implemented:
-Admin authentication using JWT tokens
-Create, update, and delete operations for:
-Blog posts
-Team members
-Company projects
-Image uploading to Cloudinary
-Email notifications sent to the client and the company owner via Nodemailer
-API documentation via Swagger – for easy testing and reference
+🔗 [Website link](https://rrp-it.cz)
 
-🧱 Tech stack:
-Node.js + Express
-MongoDB + Mongoose
-Cloudinary (image management)
-Nodemailer (email service)
-JWT (authentication)
-Swagger (API docs)
+This is the backend part of the corporate website for RRP — a company that provides IT solutions.  
+The main goal is to deliver a stable API for managing site content (projects, blog, team members) and to include a basic admin panel with authentication.
 
-👨‍💻 My role:
-Built the backend architecture from scratch
-Designed and implemented RESTful APIs
-Integrated MongoDB and designed schemas
-Developed secure admin login functionality
-Tested all endpoints with Postman and Swagger
+---
+
+## 🔧 Features implemented
+
+- Admin authentication using JWT tokens  
+- CRUD operations for:
+  - Blog posts
+  - Team members
+  - Company projects  
+- Image uploading to Cloudinary  
+- Email notifications sent via Nodemailer  
+- API documentation available via Swagger  
+
+---
+
+## 🧰 Tech stack
+
+- Node.js + Express  
+- MongoDB + Mongoose  
+- Cloudinary (image management)  
+- Nodemailer (email service)  
+- JWT (authentication)  
+- Swagger (API documentation)  
+
+---
+
+## 👨‍💻 My role
+
+- Built the backend architecture from scratch  
+- Designed and implemented RESTful APIs  
+- Integrated MongoDB and designed schemas  
+- Developed secure admin login functionality  
+- Tested endpoints with Postman and Swagger  
+
+
+
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
